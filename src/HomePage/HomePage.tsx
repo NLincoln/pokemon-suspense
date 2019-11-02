@@ -1,7 +1,18 @@
-import React, { useState, Suspense, SuspenseList } from "react";
-import LinearProgress from "@material-ui/core/LinearProgress";
-import { Resource, allLoader } from "../api";
-import { NamedAPIResourceList, Pokemon, PokemonSpecies } from "../types";
+import React, { Suspense, SuspenseList, useState } from "react";
+import {
+  Resource,
+  createTreeLoader,
+  listTransform,
+  pokemonLoader,
+  pokemonSpeciesLoader,
+  allFetcher
+} from "../api";
+import {
+  NamedAPIResourceList,
+  NamedAPIResource,
+  Pokemon,
+  PokemonSpecies
+} from "../types";
 import {
   Grid,
   Card,
@@ -12,13 +23,28 @@ import {
   Typography,
   Button
 } from "@material-ui/core";
+import { Link } from "react-router-dom";
 import { makeStyles, createStyles } from "@material-ui/styles";
 import { capitalize } from "lodash";
 
-let data = allLoader(null);
+const homePageLoader = createTreeLoader(
+  allFetcher,
+  (data: NamedAPIResourceList) => ({
+    results: listTransform(data.results, (result: NamedAPIResource) => ({
+      resource: pokemonLoader(result, (pokemon: Pokemon) => ({
+        speciesResource: pokemonSpeciesLoader(pokemon)
+      }))
+    }))
+  })
+);
 
 export default function HomePage() {
-  return <PokemonList resource={data} />;
+  let [data] = useState(() => homePageLoader(null));
+  return (
+    <Suspense fallback={"loading ;)"}>
+      <PokemonList resource={data} />
+    </Suspense>
+  );
 }
 
 function PokemonList(props: {
@@ -76,7 +102,12 @@ function PokemonView(props: {
         <CardHeader
           title={capitalize(data.name)}
           action={
-            <Button size={"small"} color={"primary"}>
+            <Button
+              component={Link}
+              to={"/pokemon/" + data.id}
+              size={"small"}
+              color={"primary"}
+            >
               View
             </Button>
           }
