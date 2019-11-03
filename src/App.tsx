@@ -5,9 +5,10 @@
 import React, { Suspense } from "react";
 import LinearProgress from "@material-ui/core/LinearProgress";
 
-import HomePage from "./HomePage/HomePage";
 import { BrowserRouter as Router, Route } from "react-router-dom";
-import PokemonDetail from "./PokemonDetail/PokemonDetail";
+
+const PokemonDetail = React.lazy(() => import("./PokemonDetail/PokemonDetail"));
+const HomePage = React.lazy(() => import("./HomePage/HomePage"));
 
 function App() {
   return (

@@ -26,25 +26,26 @@ import {
 import { Link } from "react-router-dom";
 import { makeStyles, createStyles } from "@material-ui/styles";
 import { capitalize } from "lodash";
+import { memoize } from "lodash";
 
-const homePageLoader = createTreeLoader(
-  allFetcher,
-  (data: NamedAPIResourceList) => ({
-    results: listTransform(data.results, (result: NamedAPIResource) => ({
-      resource: pokemonLoader(result, (pokemon: Pokemon) => ({
-        speciesResource: pokemonSpeciesLoader(pokemon)
-      }))
+const loader = createTreeLoader(allFetcher, (data: NamedAPIResourceList) => ({
+  results: listTransform(data.results, (result: NamedAPIResource) => ({
+    resource: pokemonLoader(result, (pokemon: Pokemon) => ({
+      speciesResource: pokemonSpeciesLoader(pokemon)
     }))
-  })
-);
+  }))
+}));
+
+const homePageLoader = memoize(loader, (...args) => JSON.stringify(args));
 
 export default function HomePage() {
-  let [data] = useState(() => homePageLoader(null));
-  return (
-    <Suspense fallback={"loading ;)"}>
-      <PokemonList resource={data} />
-    </Suspense>
+  let [data] = useState(() =>
+    homePageLoader({
+      limit: 20,
+      offset: 0
+    })
   );
+  return <PokemonList resource={data} />;
 }
 
 function PokemonList(props: {

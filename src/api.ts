@@ -110,8 +110,13 @@ export function listTransform<TData, TAddition>(
   });
 }
 
-export let allFetcher = createFetcher<any, NamedAPIResourceList>(
-  params => `https://pokeapi.co/api/v2/pokemon`
+export let allFetcher = createFetcher<
+  { limit: number; offset: number },
+  NamedAPIResourceList
+>(
+  params =>
+    `https://pokeapi.co/api/v2/pokemon?limit=${params.limit ||
+      20}&offset=${params.offset || 0}`
 );
 let pokemonFetcher = createFetcher<APIResource, Pokemon>(
   (resource: APIResource) => resource.url

@@ -3,22 +3,19 @@ import { createTreeLoader, createFetcher, Resource } from "../api";
 import { Pokemon } from "../types";
 import { useParams } from "react-router-dom";
 import { Container, Typography } from "@material-ui/core";
+import { memoize } from "lodash";
 
 const pokemonIdFetcher = createFetcher<string, Pokemon>(
   (params: string) => `https://pokeapi.co/api/v2/pokemon/` + params
 );
 
-const loader = createTreeLoader(pokemonIdFetcher, pokemon => ({}));
+const loader = memoize(createTreeLoader(pokemonIdFetcher, pokemon => ({})));
 
 export default function PokemonDetail() {
   let { pokemon_id } = useParams<{ pokemon_id: string }>();
   let [resource] = useState(() => loader(pokemon_id));
 
-  return (
-    <Suspense fallback={"loading :)"}>
-      <View resource={resource} />
-    </Suspense>
-  );
+  return <View resource={resource} />;
 }
 
 function View(props: { resource: Resource<Pokemon> }) {
