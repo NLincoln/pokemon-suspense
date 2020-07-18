@@ -7,7 +7,7 @@
     "@material-ui/icons": "^4.5.1",
     "@types/react": "^16.9.11",
     "@types/react-dom": "^16.9.3",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "react": "0.0.0-experimental-5faf377df",
     "react-dom": "0.0.0-experimental-5faf377df",
     "react-router-dom": "^5.1.2",
